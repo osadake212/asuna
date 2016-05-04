@@ -14,7 +14,7 @@ app.get('/', function(req, res) {
 
 app.post('/callback', routesCallback.callback);
 
-// errro handling
+// error handling
 app.use(function(err, req, res, next) {
   console.error(err.stack);
   res.status(500).send('Something broke!');

@@ -25,13 +25,11 @@ var postMessage = function(mids, message) {
   };
 
   request(options, function (error, response, body) {
-    console.log("-----------------------");
-    console.log(body);
+    // TODO: error handling
   });
 };
 
 exports.callback = function(req, res) {
-  console.log(req.body);
   var
     ids = [],
     result = req.body.result;
