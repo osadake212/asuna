@@ -5,9 +5,15 @@ const lineHeaders = {
   'X-Line-Trusted-User-With-ACL': process.env.LINE_TRUSTED_USER_WITH_ACL
 };
 
-var request = require('request');
+var
+  request = require('request'),
+  analyzer = require('../lib/analyzer'),
+  postMessage,
+  callback,
+  idsFromReceivedMessage,
+  receivedMessage;
 
-var postMessage = function(mids, message) {
+postMessage = function(mids, message) {
   var options = {
     url: sendMessageUrl,
     method: 'POST',
@@ -29,17 +35,37 @@ var postMessage = function(mids, message) {
   });
 };
 
-exports.callback = function(req, res) {
+idsFromReceivedMessage = function (body) {
   var
     ids = [],
-    result = req.body.result;
+    result = body.result;
 
   for (var key in result) {
     if (result.hasOwnProperty(key)) {
       ids.push(result[key].content.from);
     }
   }
+  return ids;
+}
 
-  postMessage(ids, "あすなだよ");
+receivedMessage = function(body) {
+  var result = body.result;
+
+  for (var key in result) {
+    if (result.hasOwnProperty(key)) {
+      return result[key].content.text;
+    }
+  }
+  return "";
+}
+
+callback = function(req, res) {
+  var body = req.body;
+  postMessage(
+    idsFromReceivedMessage(body),
+    analyzer.replyMessage(receivedMessage(body))
+  );
   res.status(200).send();
 };
+
+exports.callback = callback;
